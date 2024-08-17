@@ -1,0 +1,1 @@
+scatter_vector_ND(comm,rank,mainrank,domDecompND,mainArr,dtype='float')
