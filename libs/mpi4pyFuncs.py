@@ -15,8 +15,7 @@
                   from other procs
 """
 
-
-# from mpi4py import *
+from mpi4py import *
 from funcs import *
 from domainDecomposeND import *
 
@@ -314,7 +313,6 @@ def gather_vector_ND(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
 # else:
 #     mainArr = None
 
-# myArr = scatter_vector_ND(comm,size,rank,mainrank,domDecompND,mainArr,dtype='float')
 def scatter_vector_ND(comm,rank,mainrank,domDecompND,mainArr,dtype='float'):
     """
         
