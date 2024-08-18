@@ -10,10 +10,10 @@ from funcs import *
 
 
 class domainDecomposeND:
-    def __init__(self, n_processors, axes_limits, parallel_axes, user_nblocks=None, suggest_alternative=False, set_last_to1=False, decompose=True):
+    def __init__(self, n_processors, arrShape, parallel_axes, user_nblocks=None, suggest_alternative=False, set_last_to1=False, decompose=True):
         """
             Domain decomposition class designed to optimally break 
-            down an array of shape axes_limits into n_processors 
+            down an array of shape arrShape into n_processors 
             blocks for easy implementation in parallelization schemes.
             
             Required in:
@@ -25,7 +25,7 @@ class domainDecomposeND:
             Inputs:
                 Mandatory:
                     n_processors:  Total number of processors available
-                    axes_limits:   Shape of the N-dimensional array to
+                    arrShape:   Shape of the N-dimensional array to
                                    be domain decomposed
                     parallel_axes: List of m <= N integers prescribing the axes 
                                    of the N-Dimensional array to be parallelized
@@ -57,7 +57,7 @@ class domainDecomposeND:
                 n_dim:                Total number of dimensions of the data 
                 n_par_dim:            Total number of axes parallelized
                                       direction by each processor.
-                axes_limits:          The input axes_limits
+                arrShape:          The input arrShape
                 parallel_axes:        Final parallel_axes
                 user_nblocks:         The input user_nblocks
                 n_processors:         The input n_processors
@@ -65,7 +65,7 @@ class domainDecomposeND:
                 set_last_to1:         The input set_last_to1
                 decompose:            The input decompose
         """
-        n_dim    , axes_limits   = len(axes_limits)  ,np.array(axes_limits)
+        n_dim    , arrShape   = len(arrShape)  ,np.array(arrShape)
         n_par_dim, parallel_axes = len(parallel_axes),np.array(parallel_axes)
         
         slq     = np.zeros([n_dim,n_processors], int)
@@ -83,7 +83,7 @@ class domainDecomposeND:
             
             parallel_axes = np.sort(parallel_axes)
             
-            parallel_axes_limits = np.array([axes_limits[i] if i in parallel_axes else 1 for i in range(n_dim)],int)
+            parallel_arrShape = np.array([arrShape[i] if i in parallel_axes else 1 for i in range(n_dim)],int)
             
             # Parallel scheme
             if user_nblocks == None:
@@ -102,7 +102,7 @@ class domainDecomposeND:
                 
                 if n_dim - n_par_dim != __ones[0]:              raise ValueError("There is a mismatch between the axes to be parallelized {} and the prescribed \
                                                                                   block list {}! The position of the `1's in the prescribed block list must not \
-                                                                                  exist in list of the axes to be parallelized!".format(axes_limits, user_nblocks))
+                                                                                  exist in list of the axes to be parallelized!".format(arrShape, user_nblocks))
                 
                 if np.any(temp_parallel_axes != parallel_axes): raise ValueError("The prescribed block list and the list of axes to be parallelized do not match!")
                 
@@ -117,19 +117,19 @@ class domainDecomposeND:
             indices = get_nested_for_loops_indices(nblocks)
             
             for idim in range(n_dim):
-                nblockq = nblocks[idim]            
+                nblockq = nblocks[idim]
                 nlq     = np.array([ii for ii in range(0,int(nblockq)+1)])
                 if nblockq == 1:
                     # No parallelization here
-                    elq[idim,:] = axes_limits[idim]
+                    elq[idim,:] = arrShape[idim]
                 else:
-                    myslq,myelq = get_slq_elq(parallel_axes_limits[idim],nblockq)
+                    myslq,myelq = get_slq_elq(parallel_arrShape[idim],nblockq)
                     for rank in range(n_processors):
                         slq[idim,rank] = myslq[indices[idim][rank]]
                         elq[idim,rank] = myelq[indices[idim][rank]]
-                    blcq[idim,rank] = nlq[indices[idim][rank]]  
+                        blcq[idim,rank] = nlq[indices[idim][rank]]
         else:
-            elq = np.array([[axes_limits[i] for rank in range(n_processors)] for i in range(n_dim)],dtype=int)
+            elq = np.array([[arrShape[i] for rank in range(n_processors)] for i in range(n_dim)],dtype=int)
         
         # Object attributes
         self.nblock              = nblocks
@@ -137,7 +137,8 @@ class domainDecomposeND:
         self.slq                 = slq
         self.elq                 = elq
         self.mynq                = elq - slq
-        self.axes_limits         = axes_limits
+        self.split_sizes         = [np.prod(self.mynq[:,rank]) for rank in range(n_processors)]
+        self.arrShape            = arrShape
         self.parallel_axes       = parallel_axes
         self.n_dim               = n_dim
         self.n_par_dim           = n_par_dim

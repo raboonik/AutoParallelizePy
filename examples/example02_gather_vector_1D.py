@@ -1,1 +1,1 @@
-gather_vector_1D(comm, rank, mainrank, domDecompND, myinput, dtype=dtype)
+gather_array_1D(comm, rank, mainrank, domDecompND, myinput, dtype=dtype)

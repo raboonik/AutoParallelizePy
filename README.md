@@ -18,7 +18,7 @@ Git:   https://github.com/raboonik
 
 &nbsp;&nbsp;&nbsp;&nbsp;./install.sh path/to/directory
 
-or to install under the default directory simply execute
+&nbsp;&nbsp;&nbsp;&nbsp;or to install under the default directory simply execute
 
 &nbsp;&nbsp;&nbsp;&nbsp;./install.sh
 

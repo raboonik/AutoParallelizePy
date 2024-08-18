@@ -30,8 +30,8 @@ def get_subarray(rank,domDecompND,Arr,axis=None) -> np.array:
         proc rank according to the prescribed domain decomposition domDecompND.
         
         Required in: 
-            scatter_vector_ND
-            reshape_vector_ND
+            scatter_array_ND
+            reshape_array_ND
         
         Dependencies:
             Direct:
@@ -102,48 +102,8 @@ def gather_scalar(comm, size, rank, mainrank, scalarNum, dtype='int') -> np.arra
     return out
 
 
-def find_split_sizes(comm, rank, mainrank, domDecompND) -> np.array:
-    """
-        Get the total number of datapoints handled by each
-        proc and broadcast it among all the procs within comm.
-        
-        Required in:
-            gather_vector_1D
-            gather_vector_ND
-            scatter_vector_ND
-            reshape_vector_ND
-        
-        Dependencies:
-            Direct:
-                None
-            Indirect:
-                domainDecomposeND
-        
-        Inputs: 
-            MPI-communitcator (comm)
-            Proc (rank)
-            Main proc (mainrank)
-            Domain decomposition scheme (domDecompND)
-        
-        Output: 1D array containing number of datapoints
-                belonging to each proc.
-    """
-    
-    size = domDecompND.n_processors
-    
-    if rank == mainrank:
-        split_sizes = np.zeros(size, int)
-    else:
-        split_sizes = None
-    
-    comm.Gather(sendbuf=np.array(np.prod(domDecompND.mynq[:,rank]),dtype=int),recvbuf=split_sizes, root=mainrank)
-    split_sizes = comm.bcast(split_sizes,root=mainrank)
-    
-    return split_sizes
-
-
 # Axis is the position of the parallelized dimension, counting from 0
-def gather_vector_1D(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
+def gather_array_1D(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
     """
         
         
@@ -166,7 +126,7 @@ def gather_vector_1D(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
     axes_limits   = domDecompND.axes_limits
     parallel_axes = domDecompND.parallel_axes
     
-    if len(parallel_axes) > 1: raise ValueError("The number of axes to be parallelized exceed the 1D scope of gather_vector_1D!")
+    if len(parallel_axes) > 1: raise ValueError("The number of axes to be parallelized exceed the 1D scope of gather_array_1D!")
     else: parallel_axis = parallel_axes[0]
     
     if dtype == 'float':
@@ -192,7 +152,7 @@ def gather_vector_1D(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
         permutationCode_f = permutationCode_i
         rolled_axes_limits   = axes_limits
     
-    split_sizes = find_split_sizes(comm, rank, mainrank, domDecompND)
+    split_sizes = domDecompND.split_sizes
     
     if rank == mainrank:
         tempFlat = np.zeros([np.prod(axes_limits)],dtype)
@@ -215,7 +175,7 @@ def gather_vector_1D(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
 # The role of axis in the following is to gather the input array myinput where ndim(myinput) <= domDecompND.n_dim, but its 
 # domain decomposition is the same as those axes in domDecompND picked prescribed by axis. Therefore, we require that 
 # ndim(myinput) = len(axis), and where len(axis) = domDecompND.n_dim, we basically ignore axis.
-def gather_vector_ND(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
+def gather_array_ND(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
     """
         
         
@@ -241,9 +201,9 @@ def gather_vector_ND(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
     
     if len(parallel_axes) == 0: return myinput
     
-    # gather_vector_1D is slightly better than how gather_vector_ND in 1D, so
+    # gather_array_1D is slightly better than how gather_array_ND in 1D, so
     if len(parallel_axes) == 1:
-        return gather_vector_1D(comm, rank, mainrank, domDecompND, myinput, dtype=dtype)
+        return gather_array_1D(comm, rank, mainrank, domDecompND, myinput, dtype=dtype)
     
     # Firstly, sort parallel_axes0. To understand this, consider the following case: axes_limits = [nq1, npar1, nq2, npar2, npar3] and hence
     # parallel_axes = [1,3,4]. However, if, for whatever reason, domDecompND was given [npar1, npar3, npar2] (instead of [npar1, npar2, npar3]),
@@ -269,7 +229,7 @@ def gather_vector_ND(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
     else:
         allmyaxes_limits = None
     
-    split_sizes = find_split_sizes(comm, rank, mainrank, domDecompND)
+    split_sizes = domDecompND.split_sizes
     
     comm.barrier()
     
@@ -313,7 +273,7 @@ def gather_vector_ND(comm, rank, mainrank, domDecompND, myinput, dtype='float'):
 # else:
 #     mainArr = None
 
-def scatter_vector_ND(comm,rank,mainrank,domDecompND,mainArr,dtype='float'):
+def scatter_array_ND(comm,rank,mainrank,domDecompND,mainArr,dtype='float'):
     """
         
         
@@ -341,7 +301,7 @@ def scatter_vector_ND(comm,rank,mainrank,domDecompND,mainArr,dtype='float'):
         dtype    = int
         mpidtype = MPI.INT
     
-    split_sizes  = find_split_sizes(comm, rank, mainrank, domDecompND)
+    split_sizes  = domDecompND.split_sizes
     
     if rank == mainrank:
         myOutArr = np.ravel(get_subarray(mainrank, domDecompND, mainArr))
@@ -355,7 +315,7 @@ def scatter_vector_ND(comm,rank,mainrank,domDecompND,mainArr,dtype='float'):
     return myOutArr.reshape(domDecompND.mynq[:,rank])
 
 
-def reshape_vector_ND(comm, rank, mainrank, old_DomDecompND, newDomDecompND, myInputArr,  dtype='float'):
+def reshape_array_ND(comm, rank, mainrank, old_DomDecompND, newDomDecompND, myInputArr,  dtype='float'):
     """
         
         
@@ -363,7 +323,7 @@ def reshape_vector_ND(comm, rank, mainrank, old_DomDecompND, newDomDecompND, myI
             
         
         Dependencies:
-            Direct:   gather_vector_ND
+            Direct:   gather_array_ND
             Indirect: domainDecomposeND
             
         
@@ -376,7 +336,7 @@ def reshape_vector_ND(comm, rank, mainrank, old_DomDecompND, newDomDecompND, myI
     
     size = old_DomDecompND.n_processors
     # Gather everything on mainrank
-    mainRankArr = gather_vector_ND(comm, rank, mainrank, old_DomDecompND, myInputArr, dtype)
+    mainRankArr = gather_array_ND(comm, rank, mainrank, old_DomDecompND, myInputArr, dtype)
     
     if dtype == 'float':
         dtype    = float
@@ -385,7 +345,7 @@ def reshape_vector_ND(comm, rank, mainrank, old_DomDecompND, newDomDecompND, myI
         dtype    = int
         mpidtype = MPI.INT
     
-    split_sizes  = find_split_sizes(comm, rank, mainrank, newDomDecompND)
+    split_sizes  = domDecompND.split_sizes
     
     if rank == mainrank:
         myOutArr = np.ravel(get_subarray(mainrank, newDomDecompND, mainRankArr))
@@ -399,7 +359,7 @@ def reshape_vector_ND(comm, rank, mainrank, old_DomDecompND, newDomDecompND, myI
     return myOutArr.reshape(newDomDecompND.mynq[:,rank])
 
 
-def bcast_vector_ND(comm, rank, mainrank, inputArr, dtype='float'):
+def bcast_array_ND(comm, rank, mainrank, inputArr, dtype='float'):
     """
         
         
@@ -512,10 +472,10 @@ def create_update_bcast_local_subarray(comm,rank,mainrank,domDecompND,axis,newCo
         return subArr
     elif mode == 'bcast':
         if domDecompND.__dict__['rankCond']:
-            arr = gather_vector_ND(newComm, rank, mainrank, domDecompND, subArr, dtype)
+            arr = gather_array_ND(newComm, rank, mainrank, domDecompND, subArr, dtype)
         else:
             arr = None
-        arr = bcast_vector_ND(comm, rank, mainrank, arr, dtype=dtype)
+        arr = bcast_array_ND(comm, rank, mainrank, arr, dtype=dtype)
         return arr
 
 
@@ -540,52 +500,20 @@ def create_randoms_acorss_cores(comm, rank, mainrank, axes_limits, lowHigh=[-13.
     """
     
     if rank == mainrank:
-        testArr  = np.random.uniform(low=lowHigh[0], high=lowHigh[1], size=(axes_limits))
-        testArr0 = testArr.copy()
+        origArr = np.random.uniform(low=lowHigh[0], high=lowHigh[1], size=(axes_limits))
+        copyArr = origArr.copy()
     else:
-        testArr = None
+        origArr = None
     
-    testArr = bcast_vector_ND(comm, rank, mainrank, testArr)
+    origArr = bcast_array_ND(comm, rank, mainrank, origArr)
     
     if rank == mainrank:
-        if np.all(testArr == testArr0):
+        if np.all(origArr == copyArr):
             print("")
             print("Array of randoms of the prescribed shape has been successfully broadcast to all ranks!")
             print("")
         else:
             print("Something went wrong with broadcasting the array of randoms!")
-            print("np.max(np.abs(testArr-testArr0)) = ", np.max(np.abs(testArr-testArr0)))
+            print("np.max(np.abs(testArr-testArr0)) = ", np.max(np.abs(origArr-copyArr)))
     
-    return testArr
-
-
-def find_split_sizes1(comm, rank, mainrank, domDecompND) -> np.array:
-    """
-        Get the total number of datapoints handled by each
-        proc and broadcast it among all the procs within comm.
-        
-        Required in:
-            gather_vector_1D
-            gather_vector_ND
-            scatter_vector_ND
-            reshape_vector_ND
-        
-        Dependencies:
-            Direct:
-                None
-            Indirect:
-                domainDecomposeND
-        
-        Inputs: 
-            MPI-communitcator (comm)
-            Proc (rank)
-            Main proc (mainrank)
-            Domain decomposition scheme (domDecompND)
-        
-        Output: 1D array containing number of datapoints
-                belonging to each proc.
-    """
-    
-    split_sizes = gather_scalar(comm, domDecompND.n_processors, rank, mainrank, np.prod(domDecompND.mynq[:,rank]), dtype='int')
-    
-    return split_sizes
+    return origArr
