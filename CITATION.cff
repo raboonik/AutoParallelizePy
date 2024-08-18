@@ -1,0 +1,25 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: AutoParallelizePy
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Abbas
+    family-names: Raboonik
+    email: raboonik@gmail.com
+    affiliation: University of Newcastle
+    orcid: 'https://orcid.org/0000-0002-6408-1829'
+repository-code: 'https://github.com/raboonik/AutoParallelizePy.git'
+url: 'https://github.com/raboonik/AutoParallelizePy.git'
+abstract: >-
+  An easy-to-implement python library plugin for mpi4py
+  along with worked examples designed to streamline domain
+  decomposition and add a simplifying layer to noncontiguous
+  MPI parallelization of multidimensional datasets.
+license: Apache-2.0
+commit: Commit 1
+date-released: '2024-08-16'
