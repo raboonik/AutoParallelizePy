@@ -32,3 +32,11 @@ Run "add2path.sh" to automatically update the python enviornment by executing
 To uninstall and update the python environment simply run
 
 &nbsp;&nbsp;&nbsp;&nbsp;. ./uninstall.sh
+
+
+# Worked examples
+After installation, to run the worked examples
+
+&nbsp;&nbsp;&nbsp;&nbsp; cd examples
+
+&nbsp;&nbsp;&nbsp;&nbsp; mpirun -n [number of cores] python3 [exampleName].py
