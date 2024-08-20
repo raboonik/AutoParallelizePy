@@ -1,1 +1,0 @@
-mainRankArr = gather_vector_ND(comm, rank, mainrank, old_DomDecompND, myInputArr, dtype)

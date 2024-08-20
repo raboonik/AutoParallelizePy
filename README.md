@@ -25,10 +25,10 @@ Git:   https://github.com/raboonik
 ## Step 2
 Run "add2path.sh" to automatically update the python enviornment by executing
 
-&nbsp;&nbsp;&nbsp;&nbsp;./add2path.sh
+&nbsp;&nbsp;&nbsp;&nbsp;. ./add2path.sh
 
 
 # Uninstallation
 To uninstall and update the python environment simply run
 
-&nbsp;&nbsp;&nbsp;&nbsp;./uninstall.sh
+&nbsp;&nbsp;&nbsp;&nbsp;. ./uninstall.sh

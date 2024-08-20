@@ -1,1 +1,0 @@
-arr = bcast_vector_ND(comm, rank, mainrank, arr, dtype=dtype)
