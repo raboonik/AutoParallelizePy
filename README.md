@@ -9,6 +9,13 @@ Email: raboonik@gmail.com
 Git:   https://github.com/raboonik
 
 # Installation
+## Step 0
+Make sure the following python3 packages are installed
+
+&nbsp;&nbsp;&nbsp;&nbsp; Numpy
+
+&nbsp;&nbsp;&nbsp;&nbsp; mpi4py
+
 ## Step 1
 1) Make the installation script (install.sh) executable by running
 
