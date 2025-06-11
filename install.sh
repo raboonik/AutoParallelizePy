@@ -2,7 +2,7 @@
 
 : '
     Installation script for AutoParallelizePy.
-    Author:  Abbas Raboonik
+    Author:  Axel Raboonik
     Contact: raboonik@gmail.com
     GitID:   https://github.com/raboonik
 '

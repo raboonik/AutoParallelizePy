@@ -2,7 +2,7 @@
 An easy-to-implement python library plugin for mpi4py along with worked examples designed to streamline domain decomposition and add a simplifying layer to noncontiguous MPI parallelization of multidimensional datasets.
 
 # Author information
-Abbas Raboonik
+Axel Raboonik
 
 Email: raboonik@gmail.com
 
