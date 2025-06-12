@@ -8,7 +8,7 @@ message: >-
   metadata from this file.
 type: software
 authors:
-  - given-names: Abbas
+  - given-names: Axel
     family-names: Raboonik
     email: raboonik@gmail.com
     affiliation: University of Newcastle
