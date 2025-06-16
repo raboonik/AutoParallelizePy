@@ -1,12 +1,28 @@
-"""
+'''
+    AutoParallelizePy
+    
+    Author: Axel Raboonik
+    Email : raboonik@gmail.com
+    
+    Github: https://github.com/raboonik
+    
+    
     Here are some core functions to be called in
     other parts of AutoParallelizePy.
     
     Dependencies:
         funcs
-"""
+'''
 
-from funcs import *
+import numpy as np
+
+from .funcs import (
+    get_nested_for_loops_indices, 
+    get_slq_elq, 
+    get_factors_list, 
+    suggested_get_factors_list,
+    count_ones
+)
 
 
 class domainDecomposeND:

@@ -43,6 +43,7 @@ do
 done
 
 cp -r $sourceDir"/libs/" $installationDir
+cp -r $sourceDir"/__init__.py" $installationDir
 
 if [ -f $sourceDir"/add2path.sh" ]
 then
@@ -69,8 +70,8 @@ then
     touch \"$HOME"/.bashrc"\"
 fi
 
-addLine=\"export PYTHONPATH='${PYTHONPATH}:${installationDir}libs'\"
-if grep -Fxq \$addLine \$HOME"/.bashrc"
+addLine=\"export PYTHONPATH=\$HOME/.local/lib:\\\$PYTHONPATH\"
+if grep -Fxq \"\$addLine\" \"\$HOME/.bashrc\"
 then
     echo ".bashrc file already updated"
 else
@@ -111,7 +112,7 @@ fi
 if [ -d \"$installationDir\" ]
 then
     rm -r $installationDir"\*"
-    export PYTHONPATH=\${PYTHONPATH#"\":${installationDir}libs"\"}
+    export PYTHONPATH=\${PYTHONPATH#"\":${installationDir}"\"}
     echo "AutoParallelizePy uninstallation successfully!"
 else
     echo "AutoParallelizePy not installed or not found at ${installationDir}!"

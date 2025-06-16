@@ -1,10 +1,17 @@
-"""
+'''
+    AutoParallelizePy
+    
+    Author: Axel Raboonik
+    Email : raboonik@gmail.com
+    
+    Github: https://github.com/raboonik
+    
+    
     Here are the core functions of AutoParallelizePy.
     
     Dependencies:
-        domainDecomposeND
+        numpy
         mpi4py
-        funcs
     
     Variable naming: 
         comm:        MPI-communicator
@@ -19,11 +26,11 @@
     
     Tip: All the functions suffixed with "_array_ND" depend upon
     the specific domain decomposition domDecompND as an input.
-"""
+'''
 
-from mpi4py import *
-from funcs import *
-from domainDecomposeND import *
+import numpy as np
+from mpi4py import MPI
+
 alphabet = 'abcdefghijklmnopqrstuvwxyz'
 
 

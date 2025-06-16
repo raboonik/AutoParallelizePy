@@ -1,14 +1,20 @@
-import numpy as np
-
-
-"""
+'''
+    AutoParallelizePy
+    
+    Author: Axel Raboonik
+    Email : raboonik@gmail.com
+    
+    Github: https://github.com/raboonik
+    
+    
     Here are some core functions to be used in
     domainDecomposeND.
     
     Dependencies:
         None
-"""
+'''
 
+import numpy as np
 
 def get_nested_for_loops_indices(blksArr) -> np.array:
     """
@@ -53,7 +59,7 @@ def get_nested_for_loops_indices(blksArr) -> np.array:
     return indices
 
 
-def is_divisibale(divisor) -> tuple[int, int, bool]:
+def _is_divisibale(divisor) -> tuple[int, int, bool]:
     """
         Breaks down any given composite integer in terms
         of its two smaller multiples.
@@ -97,7 +103,7 @@ def get_factors_list(divisor, ltarget=None, set_last_to1=False) -> list:
             class domainDecomposeND
         
         Dependencies:
-            is_divisibale
+            _is_divisibale
         
         Input: Integer number (of,say, cores in a given
                parallelization scheme)
@@ -111,13 +117,13 @@ def get_factors_list(divisor, ltarget=None, set_last_to1=False) -> list:
     
     if ltarget == None:
         out = []
-        subn1, subn2, divisCond = is_divisibale(divisor)
+        subn1, subn2, divisCond = _is_divisibale(divisor)
         # Check if divisor is a prime number
         if not divisCond: return [divisor]
         else: out.append(subn1)
         while True:
             temp = subn2
-            subn1, subn2, divisCond = is_divisibale(subn2)
+            subn1, subn2, divisCond = _is_divisibale(subn2)
             if not divisCond: 
                 out.append(temp)
                 break
